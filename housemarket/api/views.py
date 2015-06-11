@@ -10,18 +10,23 @@ from housesales.models import HouseSales
 
 class AvgPricesView(APIView):
     def get(self, request, format=None):
-        date_init = datetime.strptime('2015-01-01', '%Y-%m-%d').date()
-        date_stop = datetime.strptime('2015-02-28', '%Y-%m-%d').date()
+        postcode = self.request.query_params.get('postcode', None)
 
-        # SELECT avg(price), property_type, date_of_transfer
-        #     FROM housesales_housesales
-        #     WHERE date_of_transfer >= '2015-01-01' AND date_of_transfer < '2015-02-28'
-        #     GROUP BY property_type, date_of_transfer
-        #     ORDER BY timee_of_transfer
+        date_init_str = self.request.query_params.get('date_init', None)
+        date_init = datetime.strptime(date_init_str, '%Y-%m-%d').date() if date_init_str else None
 
-        sales = HouseSales.objects.filter(
-            date_of_transfer__gte=date_init, date_of_transfer__lt=date_stop, postcode__contains='SE13').values(
-            'property_type', 'date_of_transfer').order_by(
-            'date_of_transfer').annotate(
-            price_avg=Avg('price'))
+        date_stop_str = self.request.query_params.get('date_stop', None)
+        date_stop = datetime.strptime(date_stop_str, '%Y-%m-%d').date() if date_stop_str else None
+
+        sales = HouseSales.objects.all()
+
+        if postcode:
+            sales = sales.filter(postcode__contains=postcode)
+        if date_init:
+            sales = sales.filter(date_of_transfer__gte=date_init)
+        if date_stop:
+            sales = sales.filter(date_of_transfer__lt=date_stop)
+
+        sales = sales.values('property_type', 'date_of_transfer').order_by('date_of_transfer').annotate(price_avg=Avg('price'))
+
         return Response({'sales': sales})
