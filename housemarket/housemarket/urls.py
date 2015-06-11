@@ -16,6 +16,9 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
+from api import views as api_views
+
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^sales/$', api_views.AvgPricesView.as_view(), name='house_sales'),
 ]
