@@ -15,15 +15,23 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+def get_env_variable(var_name):
+    """ Get the environment variable or return exception """
+
+    try:
+        return os.environ[var_name]
+    except KeyError:
+        error_msg = "Set the %s environment variable" % var_name
+        raise ImproperlyConfigured(error_msg)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ks4lcx3tijllo040zwq&47-colguyq-@ge=cazirr&w%&j#0_n'
+SECRET_KEY = get_env_variable('HOUSEMARKET_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = get_env_variable('HOUSEMARKET_DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -80,12 +88,12 @@ WSGI_APPLICATION = 'housemarket.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "housemarket_test",
-        "USER": "",
-        "PASSWORD": "",
-        "HOST": "localhost",
-        "PORT": "",
+        "ENGINE": get_env_variable("HOUSEMARKET_DB_ENGINE"),
+        "NAME": get_env_variable("HOUSEMARKET_DB_NAME"),
+        "USER": get_env_variable("HOUSEMARKET_DB_USER"),
+        "PASSWORD": get_env_variable("HOUSEMARKET_DB_PASSWORD"),
+        "HOST": get_env_variable("HOUSEMARKET_DB_HOST"),
+        "PORT": get_env_variable("HOUSEMARKET_DB_PORT"),
     }
 }
 
