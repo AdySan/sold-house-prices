@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.db.models import Avg, Min, Max, Count
+from django.db.models import Avg
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
