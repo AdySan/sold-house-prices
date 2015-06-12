@@ -21,4 +21,5 @@ from api import views as api_views
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^sales/$', api_views.AvgPricesView.as_view(), name='house_sales'),
+    url(r'^transactions/$', api_views.TransactionsPriceBrackets.as_view(), name='house_transactions'),
 ]

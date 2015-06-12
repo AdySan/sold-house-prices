@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'rest_framework',
     'api',
     'housesales',
+    'debug_toolbar',
 )
 
 MIDDLEWARE_CLASSES = (
