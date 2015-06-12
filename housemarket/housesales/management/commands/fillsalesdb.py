@@ -12,6 +12,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--csv', type=str)
+        parser.add_argument('--postcode', type=str)
+        parser.add_argument('--maxrows', type=int)
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -22,8 +24,15 @@ class Command(BaseCommand):
                 reader = csv.reader(f)
 
                 housesales = []
+                max_rows = options['maxrows'] if options['maxrows'] else None
+                postcode = options['postcode'] if options['postcode'] else None
+                count = 0
 
                 for row in reader:
+                    if max_rows:
+                        if count == max_rows:
+                            break
+
                     hs = HouseSales()
 
                     hs.transaction_id = row[0][1:len(row[0]) -1]
@@ -42,6 +51,12 @@ class Command(BaseCommand):
                     hs.county = row[13]
                     hs.status = row[14]
 
-                    housesales.append(hs)
+                    if postcode:
+                        if hs.postcode.startswith(postcode):
+                            housesales.append(hs)
+                            count += 1
+                    else:
+                        housesales.append(hs)
+                        count += 1
 
                 HouseSales.objects.bulk_create(housesales)
