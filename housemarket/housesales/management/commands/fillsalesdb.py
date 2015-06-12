@@ -19,14 +19,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if options['csv']:
             file_name = options['csv']
+            count = 0
             print 'Filling house sales db with: {0}'.format(file_name)
+
             with open(file_name, 'rU') as f:
                 reader = csv.reader(f)
 
                 housesales = []
                 max_rows = options['maxrows'] if options['maxrows'] else None
                 postcode = options['postcode'] if options['postcode'] else None
-                count = 0
 
                 for row in reader:
                     if max_rows:
@@ -60,3 +61,4 @@ class Command(BaseCommand):
                         count += 1
 
                 HouseSales.objects.bulk_create(housesales)
+            print 'Imported {0} rows into db'.format(count)
