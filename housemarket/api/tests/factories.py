@@ -1,5 +1,5 @@
 import factory
-from datetime import datetime
+import datetime
 from housesales.models import HouseSales
 
 
@@ -8,7 +8,7 @@ class HouseSalesFactory(factory.DjangoModelFactory):
 
     transaction_id = "1A75C2AB-A2DF-4549-A938-00008A73F7CF"
     price = 250000
-    date_of_transfer = datetime.date(2015, 6, 13)
+    date_of_transfer = datetime.date(2015, 06, 13)
     postcode = "SE13 7AW"
     property_type = "F"
     old_new = "Y"

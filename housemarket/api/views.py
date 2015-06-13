@@ -23,7 +23,7 @@ def _filter_sales(request):
     if date_init:
         sales = sales.filter(date_of_transfer__gte=date_init)
     if date_stop:
-        sales = sales.filter(date_of_transfer__lt=date_stop)
+        sales = sales.filter(date_of_transfer__lte=date_stop)
 
     return sales
 
