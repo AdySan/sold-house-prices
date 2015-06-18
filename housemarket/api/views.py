@@ -79,38 +79,26 @@ class TransactionsPriceBrackets(APIView):
 
     def get(self, request, format=None):
         sales = _filter_sales(request)
+        number_of_chunks = int(request.query_params.get('number_of_chunks', 8))
 
         min_price = self._find_min(sales)
         max_price = self._find_max(sales)
 
-        chunk_size = (max_price - min_price) // 8
+        chunk_size = (max_price - min_price) // number_of_chunks
 
-        chunk_1_start = min_price
-        chunk_2_start = chunk_1_start + chunk_size
-        chunk_3_start = chunk_2_start + chunk_size
-        chunk_4_start = chunk_3_start + chunk_size
-        chunk_5_start = chunk_4_start + chunk_size
-        chunk_6_start = chunk_5_start + chunk_size
-        chunk_7_start = chunk_6_start + chunk_size
-        chunk_8_start = chunk_7_start + chunk_size
+        chunks = range(min_price, max_price, chunk_size)
+        transactions_brackets = []
 
-        transactions_in_bracket_1 = self._count_transactions_in_price_range(sales, chunk_1_start, chunk_2_start, include_start=True, include_end=False)
-        transactions_in_bracket_2 = self._count_transactions_in_price_range(sales, chunk_2_start, chunk_3_start, include_start=True, include_end=False)
-        transactions_in_bracket_3 = self._count_transactions_in_price_range(sales, chunk_3_start, chunk_4_start, include_start=True, include_end=False)
-        transactions_in_bracket_4 = self._count_transactions_in_price_range(sales, chunk_4_start, chunk_5_start, include_start=True, include_end=False)
-        transactions_in_bracket_5 = self._count_transactions_in_price_range(sales, chunk_5_start, chunk_6_start, include_start=True, include_end=False)
-        transactions_in_bracket_6 = self._count_transactions_in_price_range(sales, chunk_6_start, chunk_7_start, include_start=True, include_end=False)
-        transactions_in_bracket_7 = self._count_transactions_in_price_range(sales, chunk_7_start, chunk_8_start, include_start=True, include_end=False)
-        transactions_in_bracket_8 = self._count_transactions_in_price_range(sales, chunk_8_start, max_price, include_start=True, include_end=True)
+        for i, c in enumerate(chunks):
+            include_end = (i == len(chunks) -1)
+            transactions_brackets.append(self._count_transactions_in_price_range(
+                sales,
+                c,
+                c + chunk_size,
+                include_start=True,
+                include_end=include_end))
 
         return Response({'total_transactions': sales.count(),
                         'min_price': min_price,
                         'max_price': max_price,
-                        'transactions_in_bracket_1': transactions_in_bracket_1,
-                        'transactions_in_bracket_2': transactions_in_bracket_2,
-                        'transactions_in_bracket_3': transactions_in_bracket_3,
-                        'transactions_in_bracket_4': transactions_in_bracket_4,
-                        'transactions_in_bracket_5': transactions_in_bracket_5,
-                        'transactions_in_bracket_6': transactions_in_bracket_6,
-                        'transactions_in_bracket_7': transactions_in_bracket_7,
-                        'transactions_in_bracket_8': transactions_in_bracket_8})
+                        "transactions_brackets": transactions_brackets})
